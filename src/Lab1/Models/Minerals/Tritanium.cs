@@ -1,3 +1,3 @@
 ﻿namespace Itmo.ObjectOrientedProgramming.Lab1.Models.Minerals;
 
-public record Tritanium();
+public record Tritanium() : Mineral;
