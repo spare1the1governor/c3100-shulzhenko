@@ -5,6 +5,9 @@ namespace Itmo.ObjectOrientedProgramming.Lab1.Contract;
 
 public abstract class ContractBase
 {
+
+   
+
     public AsterBelt AsteroidBelt { get; }
 
     public Fleet Fleet { get; }
@@ -16,7 +19,7 @@ public abstract class ContractBase
     protected ContractBase(AsterBelt asteroidBelt, Fleet fleet, Dictionary<string, int> priceList, string contractType)
     {
         // Проверка пояса астероидов
-        if (string.IsNullOrWhiteSpace(asteroidBelt))
+        if (asteroidBelt == null)
             throw new ArgumentException("Название пояса астероидов не может быть пустым.", nameof(asteroidBelt));
 
         if (fleet == null || fleet.Length == 0)
@@ -38,6 +41,34 @@ public abstract class ContractBase
         Fleet = fleet;
         PriceList = priceList;
         ContractType = contractType;
+    }
+
+    public ValidityResponse isValid()
+    {
+        decimal totalProduction = 0;
+        foreach (var ship in Fleet.ships)
+        {
+            totalProduction += ship.GetProductionForCycle();
+        }
+        if (totalProduction == 0)
+            return new ValidityResponse
+            {
+                isValid = false,
+                notValidReason = "No producing ships"
+            };
+
+        var minerals = AsteroidBelt.OreType.ExitOfUnit.keys();
+        foreach (var m in minerals)
+        {
+            if (!PriceList.ContainKey(m))
+                return new ValidityResponse
+                {
+                    isValid = false,
+                    notValidReason = $"Price of {nameof(m)} is not listed"
+                };
+        }
+
+        return new ValidityResponse { isValid = true };
     }
 
     public abstract bool ShouldContinue(int currentHours, decimal currentVolume);
