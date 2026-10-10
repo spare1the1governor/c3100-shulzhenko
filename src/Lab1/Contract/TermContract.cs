@@ -3,7 +3,7 @@ using Itmo.ObjectOrientedProgramming.Lab1.Models.Ships;
 
 namespace Itmo.ObjectOrientedProgramming.Lab1.Contract;
 
-public class TermContract : Contract
+public class TermContract : ContractBase
 {
     public int MaxHours { get; }
 
@@ -11,26 +11,39 @@ public class TermContract : Contract
         AsterBelt asteroidBelt,
         Fleet fleet,
         Dictionary<string, int> priceList,
-        int maxHours) // <-- Добавили срок
+        int maxHours)
         : base(asteroidBelt, fleet, priceList, "term")
     {
+        if (maxHours <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxHours), "Срок контракта должен быть больше 0.");
+
         MaxHours = maxHours;
     }
 
-    public override ValidityResponse isValid()
+    public override ValidityResponse Validate()
     {
-        var baseRes = base().isValid();
+        ValidityResponse baseResult = base.Validate();
 
-        if (baseRes.isValid == false)
-            return baseRes;
+        if (!baseResult.IsValid)
+            return baseResult;
 
-        var timeWork = MaxHours - (AsteroidBelt.distance / Fleet.Speed) * 2 - 1;
-        if (timeWork < 0)
-            return new ValidityResponse { isValid = false, notValidReason = "Not enough time" };
+        // полет туда + 1 час работы + полет обратно
+        decimal minimalTime = (AsteroidBelt.Distance / Fleet.Speed * 2) + 1;
+
+        // проверка 3го требования
+        if (minimalTime > MaxHours)
+        {
+            return new ValidityResponse(
+                false,
+                "Срок контракта меньше времени полета и работы.");
+        }
+
+        return new ValidityResponse(true, null);
     }
 
     public override bool ShouldContinue(int currentHours, decimal currentVolume)
     {
+        // требование начала рейса
         return currentHours < MaxHours;
     }
 }

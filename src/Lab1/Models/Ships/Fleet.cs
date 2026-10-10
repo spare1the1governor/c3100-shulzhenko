@@ -36,16 +36,16 @@ public class Fleet
         }
     }
 
-    private readonly List<ShipState> _shipStates;
+    public IReadOnlyList<Ship> Ships { get; }
 
-    public readonly Ship[] ships;
+    private readonly List<ShipState> _shipStates;
 
     public Fleet(Ship[] ships)
     {
         if (ships.Length == 0)
-            throw new ArgumentException("-----В контракте не указаны корабли для флота.");
+            throw new ArgumentException("НЕ переданны корабли для флота.");
 
-        this.ships = ships;
+        Ships = ships;
         _shipStates = new List<ShipState>(ships.Length);
 
         foreach (Ship ship in ships)
@@ -61,7 +61,6 @@ public class Fleet
 
     public decimal GetHourlyRent()
     {
-        
         decimal hourlyRent = 0;
 
         foreach (ShipState state in _shipStates)

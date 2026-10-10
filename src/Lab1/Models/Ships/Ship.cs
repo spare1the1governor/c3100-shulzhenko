@@ -21,5 +21,6 @@ public abstract class Ship
         RentalRatePerHour = rentalRatePerHour;
     }
 
+    // количество руды м³ добываемое кораблём в зависимости от цикла работы
     public abstract decimal GetProductionForCycle(int cycleInTrip);
 }
